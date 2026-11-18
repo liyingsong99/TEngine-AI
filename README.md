@@ -94,7 +94,9 @@
 从 Unity 项目通过项目内 AIBridge CLI 执行 `compile unity`、`editor play`、`get_logs` 等命令获取真实 Editor 结果；
 本仓库不使用 Python 工作流。小改交付摘要，重要任务只维护一份记录；不自动安装、提交、打包或发布。
 
-入口：[AGENTS.md](AGENTS.md) | [Unity 项目约束](UnityProject/AGENTS.md) | [团队使用手册](Books/AI-Development-Workflow.md)
+开发前先查[已有能力索引](Books/AI-Capabilities.md)：按任务关键词定位模块、基础组件、工具、源码与生命周期限制，优先复用已有能力。
+
+入口：[AGENTS.md](AGENTS.md) | [Unity 项目约束](UnityProject/AGENTS.md) | [已有能力知识库](Books/AI-Capabilities.md) | [团队使用手册](Books/AI-Development-Workflow.md)
 
 ---
 

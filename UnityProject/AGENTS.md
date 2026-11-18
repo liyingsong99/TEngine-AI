@@ -1,6 +1,6 @@
 # Unity Project Instructions
 
-公共工作方式见 [仓库入口](../AGENTS.md)。本文件只补充 Unity 项目约束。
+公共工作方式见 [仓库入口](../AGENTS.md)。开发前按[已有能力索引](../Books/AI-Capabilities.md)查模块、组件和真实源码入口。本文件只补充 Unity 项目约束。
 
 ## 工程事实
 
