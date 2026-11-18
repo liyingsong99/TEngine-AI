@@ -1,98 +1,51 @@
 # 连接、发现与执行
 
-所有示例从 Unity 项目根执行；`<...>` 是需要替换的值。
-包装器实现见 [workflow.py](../../../scripts/workflow.py)、
-[unity.py](../../../scripts/workflow_lib/unity.py)。本地和 CI 使用相同入口，不自动安装或启动 Editor。
+以下示例从 UnityProject 执行，`$CLI = './.aibridge/cli/AIBridgeCLI.exe'`。不自动启动或安装 Editor。
 
 ## 目标绑定
 
-1. 读 `git status`、`ProjectVersion.txt`、包元数据和本次任务，保留已有修改。
-2. `doctor` 记录环境与连接。CLI 的 `status --project-path` 使用子串筛选；
-   工作流还会规范化并逐字核对返回的项目路径，拒绝多实例和相似路径。
-3. 新编译、测试或写入还须读取 `editor status`，检查编译、重载、导入和 Play 状态是否允许该操作。
-   Server `ready` 只是服务可接收请求，不代表后续编译已经结束。
-4. 同项目编译、测试、导入和写入串行。状态轮询允许观察忙状态；每次重连仍绑定同一工程。
+1. 读取 git status、ProjectVersion、包清单和任务范围；保留已有修改。
+2. 核对本项目绝对路径与唯一 Editor，随后 `editor get_state` 读取编译、导入、Play 状态。响应里的 Editor 安装路径不等于项目路径，须结合项目本地 CLI 与进程身份。
+3. 新编译、导入、测试及写入前确保状态适合操作，并串行使用 Editor；状态观察无需空闲。
+4. 不读取或输出鉴权描述文件，不连接其他工程替代验证；弹窗不自动保存、丢弃或关闭。
 
-2022.3 没有完整的模态弹窗镜像。请求无响应可能需要维护者处理弹窗，不能自动点击保存、重置或关闭项目。
-不读取或打印 `Library/Pipeline` 描述文件；CLI 负责发现、token 和传输选择。
-
-## 发现与参数
+## 本地 help 与查询示例
 
 ```powershell
-python .codex/scripts/workflow.py unity list
-python .codex/scripts/workflow.py unity describe "component get_fields"
-python .codex/scripts/workflow.py unity query "editor status"
-python .codex/scripts/workflow.py unity query "scene list_open"
-python .codex/scripts/workflow.py unity query "settings.player get"
+& $CLI --help
+& $CLI prefab --help
+& $CLI inspector get_property --help
+& $CLI scene get_active
+& $CLI scene get_hierarchy --depth 3
+& $CLI asset find --filter 't:Prefab' --format paths
 ```
 
-`unity list` 返回 canonical 命令全名；`unity describe` 是项目包装器功能，
-从 `pipeline list_commands` 的完整目录中精确选择 schema，并不是包内名为 describe 的命令。
-首次按组探索时，可用原生 CLI 缩小目录：
+help 确认命令语法，实际目标仍需执行查询并核对。当前场景查询 action 是 get_active/get_hierarchy；asset find 必须提供 filter。不要照搬其它工具的 help 参数或场景命令。
+
+复杂参数先检查是否支持 `--stdin`，批量任务按已安装 aibridge-batch-script 规程；不要自行改字段命名。默认后端与可选 Pipeline 后端按本地 help 区分，缺失能力不能靠换旧 CLI 路径绕过。
+
+## Editor C#
+
+先读取实际项目公共 API。长脚本写到 `.aibridge/code` 下的 `.csx/.cs`；正式可复用实现放正常版本管理目录，脚本只是调用层。
 
 ```powershell
-& ./Tools/unity.exe --json --non-interactive --no-log-proxy command --project-path . pipeline list_commands --detail groups
-& ./Tools/unity.exe --json --non-interactive --no-log-proxy command --project-path . pipeline list_commands --detail compact --group prefab
-& ./Tools/unity.exe --json --non-interactive --no-log-proxy command --project-path . pipeline list_commands --detail full --query "prefab save_contents"
+& $CLI code execute --help
+# task.csx 必须是本任务已创建、审阅的脚本。
+& $CLI code execute --file .aibridge/code/task.csx --timeout 30000
 ```
 
-`query` 匹配名称、说明和标签的子串，返回结果还需按 `command` 精确选择。
-完整 schema 比复制的参数表可靠。`animation.animator` 是一个 group，不能拆成三个单词。
-项目自定义 `tengine_bake_ugui`、`tengine_validate_assets` 位于 `global` 组，其短名是显式支持的项目便捷名。
+native 默认执行；Pipeline backend 默认 dry-run，实际运行要求该后端的明确参数。不得将编译预检当作运行验收。code execute 单次串行；超时先 `code status`，查原请求和实际写入结果，不重放、不自动换后端。
 
-包装器参数放入 JSON 文件，经 `--params-file` 传入。例如读取已确认 Prefab 的字段：
+## 授权与恢复
 
-```json
-{"target":{"path":"Assets/Actual.prefab"},"field":"m_Name","detail":"value"}
-```
+预览应列项目、输入、对象/资源、覆盖/删除及保存范围。沿用会话中有效授权，范围变化才补确认。无 dry-run 时先静态审查，不编造预览成功。某些 Unity API 会保存全局脏资源，执行前检查真实实现。
 
-```powershell
-python .codex/scripts/workflow.py unity query "component get_fields" --params-file request.json
-```
-
-示例资源需替换为实际查到的路径。按 schema 原样使用 `filter-type`、`include-explicit` 等键；
-不要把项目命令的 `json_path` 和 `dry_run` 自动改成连字符。执行器的 `format/json/fields/verbose/omit-nulls`
-以及目标选择参数不应作为业务参数混入。
-
-## 两种执行入口
-
-包装器提供已审核的查询与写入策略，不是任意命令透传器。被 query 拒绝表示尚未纳入只读策略，
-不代表 Pipeline 没有这个能力。
-
-未封装能力先查包文档、schema、实现及副作用。一次性任务可在完成同样的目标绑定、预览和实际授权后使用原生 CLI，
-把准确 argv、结果和产物记入任务证据；要长期自动化的能力再加入策略和契约测试。
-不能借原生 CLI、菜单、eval 或 shell 绕过授权或直接编辑 Scene/Prefab YAML。
-
-列表命令可能输出 JSON 对象、数组或逐行 JSON；终端格式化可能让空列表没有输出。
-空 stdout 不足以证明资源或用例存在。必须检查退出码、外层传输状态和内层业务结果。
-
-## 预览与授权
-
-```powershell
-python .codex/scripts/workflow.py unity preview "settings.player set" --params-file request.json
-python .codex/scripts/workflow.py approve --plan <preview.json> --by <approver> --reason <actual-confirmation> --high-risk
-python .codex/scripts/workflow.py unity apply --plan <preview.json> --approval <approval.json>
-```
-
-先展示项目、目标、输入、覆盖/删除、保存范围和可恢复性。沿用会话中覆盖这些具体操作的有效授权；
-缺少对应确认时才等待用户。approve 记录真实确认，不代替确认。
-无 dry-run 的命令只能先做静态范围预览，并明确哪些检查没有运行。
-包的新增对象命令未必带 confirm；没有参数门禁不代表获得了用户许可。
-
-包装器审批绑定工作树、项目、命令、输入哈希，1 小时有效、一次尝试。
-范围或输入变化需新预览；超时也消耗本次尝试。CI 的确认来自真实的人工批准阶段。
-记录用于防误操作，不是抗恶意本地修改的权限系统。
-部分命令调用全局 `AssetDatabase.SaveAssets`，确认范围必须包含可能保存的其他脏资源。
-
-## 中断恢复
-
-| 现象 | 下一步 |
+|情况|处理|
 |---|---|
-| 本工程零实例、错误工程或多实例 | 记录 blocked，维护者打开/选定本工程，不借用其他项目 |
-| 导入、编译、域重载 | 有限重试只读观察，核对项目与 Editor 身份，不重发起始操作 |
-| 命令已发送后超时 | 结果未知；查对应状态、目标资源、GUID 和文件，再决定新操作 |
-| 内层 error/failed/canceled 或不匹配结果 | 失败；保留证据，不能仅凭退出码 0 通过 |
-| 发现零匹配测试 | 核对程序集和筛选器，不改跑无关测试 |
-| 残留 editor.lock | 核对持有进程和在途操作，由维护者处理，不自动删锁 |
+|零实例/错误项目/本项目多实例|报告阻塞，不借用其它项目|
+|正在导入/编译/重载|只读观察原操作，不重复发起|
+|写入超时|结果未知；查原请求、路径、GUID 与对象实际状态|
+|内层 failed/canceled/error|报告失败，不能只用进程退出 0 验收|
+|零测试或结果不属于本轮|报告未验证，核对筛选器和运行身份|
 
-编译/测试详见 [验证与证据](verification.md)，内容写入见 [内容操作](authoring.md)。
+不自动删除缓存/锁或回滚工作树。详细验证见[验证规程](verification.md)，对象写入见[内容操作](authoring.md)。

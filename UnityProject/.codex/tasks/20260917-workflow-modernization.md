@@ -1,5 +1,7 @@
 # TEngine 开发工作流重整
 
+> 历史归档（2026-11-18 标记）：下文保留当时决策与证据，不是当前执行指令。旧工具和结论不得作为现有能力保证；当前入口见[工作流指南](../../../Books/AI-Development-Workflow.md)。历史报告可能只存在原机器的忽略目录，缺失时不得重建或伪造。
+
 - ID: 20260917-workflow-modernization
 - 状态: implemented / automated gates passed；生产字体与设备视觉验收未完成
 - 负责人: Codex / 项目维护者

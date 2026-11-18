@@ -1,6 +1,6 @@
 # HtmlToUGUI 的 UI-DSL
 
-此规范限定当前浏览器烘焙脚本和 `HtmlToUGUIBakeService` 支持的 HTML 子集。
+此规范限定工程浏览器转换器与 `HtmlToUGUIBaker`/`HtmlToUGUIBakeApi` 支持的 HTML 子集。
 HTML 测量得到 JSON；生成 Prefab、资源导入和 Unity 视觉验收是后续独立阶段。
 
 ## 根节点与分辨率
@@ -8,7 +8,7 @@ HTML 测量得到 JSON；生成 Prefab、资源导入和 Unity 视觉验收是�
 - 使用唯一的命名根节点，声明 `data-u-type="div"` 和 `data-u-name`。
 - 根节点通过 CSS `width`、`height` 定义设计尺寸，并与烘焙参数一致。
 - 将生成节点放在根节点范围内；滚动内容超出可视区域时检查实际 ScrollRect 层级。
-- 烘焙尺寸参数接受 `1..8192` 的整数，不随意放大画布掩盖布局问题。
+- 按实际设计尺寸设置根节点，不随意放大画布掩盖布局问题；尺寸限制以当前转换器及 API 为准。
 
 例如：
 
@@ -54,7 +54,7 @@ HTML 测量得到 JSON；生成 Prefab、资源导入和 Unity 视觉验收是�
      style="background-image: url(images/bg.png); background-size: cover;"></div>
 ```
 
-支持的输入形式：
+浏览器与交互窗口可使用以下来源形式；自动化 Bake API 另有限制，不能把窗口能力当作 API 保证：
 
 - Unity JSON 输入可使用 `Assets/...` 或 `Packages/...` 资源路径。
 - 相对本地路径由 HTML/JSON 的来源目录或配置的来源根目录解析。
@@ -63,7 +63,7 @@ HTML 测量得到 JSON；生成 Prefab、资源导入和 Unity 视觉验收是�
 
 浏览器烘焙使用 HTML 相对本地图片路径，或浏览器能解析的 file URL。
 `Assets/...`、`Packages/...` 不是浏览器别名；浏览器能访问文件也不代表它符合 Unity 预检的来源范围。
-所有引用图片都须实际存在，示例中的路径需配套本地文件。预览中的图片哈希、目标路径和 importer 变化属于写入范围。
+所有图片须实际存在；示例路径需配套文件。当前 Bake API 只接受已导入的 Assets/Packages Sprite，不能直接接受浏览器相对图片路径，也不返回图片内容哈希或 importer 差异。需要复制/导入时另行明确范围。
 
 不支持：
 
@@ -105,7 +105,7 @@ HTML 测量得到 JSON；生成 Prefab、资源导入和 Unity 视觉验收是�
 显式布局需同时给出两组 anchors 和两组 offsets；pivot 可按需声明。
 
 `data-u-safe-area="true"` 当前只映射为拉伸意图，不生成运行时安全区组件，也不证明刘海屏适配通过。
-生成 Prefab 不包含临时 Canvas，宿主 CanvasScaler 按预览的 `canvasIntegration` 配置并另行验证。
+生成 Prefab 不包含临时宿主 Canvas；窗口根有 Canvas/GraphicRaycaster。按返回的 referenceResolution 与实际宿主 CanvasScaler 核对布局，API 没有 canvasIntegration 返回字段。
 
 ## 控件属性
 
@@ -120,10 +120,10 @@ HTML 测量得到 JSON；生成 Prefab、资源导入和 Unity 视觉验收是�
 ## CSS 与文字
 
 - 设计尺寸优先用 `px`；flex、绝对定位、margin、padding 由浏览器计算最终矩形，不转换成对应 Unity 布局组件。
-- 烘焙时避免 animation、transition。脚本、事件属性、外部 frame、link 和导航 metadata 会被拒绝。
-- 字体使用本地 CSS `@font-face`；脚本等待字体与图片加载，缺失资源应使烘焙失败。
+- 烘焙时避免 animation、transition。输入必须人工/工具审阅排除脚本、事件属性、外部 frame、link 和导航 metadata；不要假定当前浏览器转换器自动拒绝所有主动内容。
+- 字体使用本地 CSS `@font-face`；调用方先等待字体与图片加载并检查缺失；不把退役自动化脚本的等待/失败保证套到当前浏览器转换器。
 - `background-color`、`color`、`font-size`、`text-align` 可进入样式数据；浏览器支持的其他 CSS 不保证在 UGUI 复现。
-- CSS 字体文件不会自动转换为 TMP 字体资源；实际 Unity 字体、字形覆盖和排版须另验。
+- CSS 字体文件不会自动转换为 Unity 字体资源；当前 Demo 使用 UGUI Text 和工程已有 Font，中文覆盖与排版须另验。通用 TMP 模式仅按其他任务的明确约定选择。
 - PC/mobile/pad 需要分别检查布局；单张浏览器截图不能证明 Unity 多端视觉通过。
 
 ## 示例

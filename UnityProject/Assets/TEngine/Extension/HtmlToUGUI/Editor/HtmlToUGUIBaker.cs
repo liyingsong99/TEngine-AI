@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using UnityEditor;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
@@ -715,26 +715,35 @@ namespace HtmlToUGUI
                 return;
             }
 
-            if (useScriptGeneratorNaming)
-            {
-                NormalizeNodeNamesByScriptGenerator(rootNode);
-            }
-
-            BakeContext bakeContext = CreateBakeContext(rootNode);
-            ConfigureCanvasScaler(targetCanvas, bakeContext);
-
-            if (clearSameNameBeforeBake)
-            {
-                RemoveExistingRoot(targetCanvas.transform, rootNode.name);
-            }
-
-            GameObject rootGo = CreateUINode(rootNode, targetCanvas.transform, null, bakeContext, 0f, 0f);
+            GameObject rootGo = GenerateTree(this, rootNode, targetCanvas, clearSameNameBeforeBake);
             Undo.RegisterCreatedObjectUndo(rootGo, "Bake UI Prototype");
             if (selectGeneratedRoot) Selection.activeGameObject = rootGo;
             lastJsonSummary = $"烘焙完成: {rootGo.name}，节点数: {CountNodes(rootNode)}。";
             lastJsonSummaryType = MessageType.Info;
 
             Debug.Log($"[HtmlToUGUIBaker] 烘焙完成: 成功生成 UI 树 [{rootGo.name}]，当前基准分辨率已适配。");
+        }
+
+        // 窗口和自动化入口共享同一套命名、布局及控件生成逻辑。
+        internal static GameObject GenerateTree(HtmlToUGUIBaker baker, UIDataNode rootNode,
+            Canvas canvas, bool clearSameName = false)
+        {
+            if (baker.useScriptGeneratorNaming)
+                baker.NormalizeNodeNamesByScriptGenerator(rootNode);
+            BakeContext context = baker.CreateBakeContext(rootNode);
+            baker.ConfigureCanvasScaler(canvas, context);
+            if (clearSameName)
+                baker.RemoveExistingRoot(canvas.transform, rootNode.name);
+            return baker.CreateUINode(rootNode, canvas.transform, null, context, 0f, 0f);
+        }
+
+        internal void ConfigureForApi(HtmlToUGUIConfig bakeConfig, bool legacyText)
+        {
+            config = bakeConfig;
+            selectedResolutionIndex = 0;
+            currentMode = InputMode.RawString;
+            useLegacyText = legacyText;
+            useScriptGeneratorNaming = true;
         }
 
         private void RemoveExistingRoot(Transform canvasTransform, string rootName)

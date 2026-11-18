@@ -1,6 +1,6 @@
 # Control Mapping
 
-`HtmlToUGUIBakeService` maps `data-u-type` values to Unity UGUI objects; the window and CLI share it.
+`HtmlToUGUIBaker.GenerateTree` maps `data-u-type` values to Unity UGUI objects; the window and project `HtmlToUGUIBakeApi` share it. AIBridge calls the API through `code execute`, rather than providing a project-specific bake command.
 
 ## Component Mapping
 
@@ -23,7 +23,7 @@ For `div` and `image`, the baker creates an `Image` component first, then tries 
 1. `imageSrc`
 2. `backgroundImageSrc`
 
-Supported path resolution:
+The shared window implementation can resolve the following paths. This list is not the automated API's input contract:
 
 - `Assets/...`
 - `Packages/...`
@@ -31,15 +31,15 @@ Supported path resolution:
 - relative paths from the explicit configured/JSON source root
 - absolute local paths inside the explicit source root, copied into `HtmlToUGUIConfig.importedImageFolder`
 
-The automated path fails preflight for unsupported or missing required images:
+The current Bake API accepts only existing imported Sprite paths under Assets/ or Packages/, so it does not provide external image copying. The shared generator still invokes EnsureTextureImportedAsSprite, which can change alphaIsTransparency and reimport even an existing Sprite. Inspect and authorize these effects; preflight alone does not prove that importers stay unchanged. Unsupported or missing images fail preflight, including:
 
 - remote HTTP/HTTPS URLs
 - `data:` URIs
 - missing local files
 
 The interactive window retains its older warning-only image behavior. It is not the CI acceptance path.
-Imported copies have deterministic relative-source hashes; repeated bakes do not allocate new filenames.
-Package textures must already be imported Sprites; automation never changes package importers.
+The window's ImportLocalImage uses GenerateUniqueAssetPath; repeated external imports may allocate new filenames, rather than deterministic hashes.
+Package textures must already be imported Sprites. Check shared importer behavior and package writability; do not assume package paths are automatically exempt from importer calls.
 
 `imageFit` behavior:
 
@@ -48,7 +48,7 @@ Package textures must already be imported Sprites; automation never changes pack
 - `slice`: use `Image.Type.Sliced` when the Sprite has a border
 
 `cover` currently preserves aspect, but does not implement browser-style crop-to-fill.
-CSS fonts are not converted into TMP assets. The CLI requires an existing TMP default font when text is generated.
+CSS fonts are not converted into Unity font assets. The tank Demo explicitly uses `legacyText:true` with an existing project `Font`, generating `UnityEngine.UI.Text`. Only the separately selected TMP mode requires TMP settings/default font; do not import TMP resources for this Demo.
 Validate glyph coverage and metrics in Unity. Zero slider values and unchecked toggles must survive round trips.
 
 ## RectTransform Mapping

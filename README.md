@@ -88,11 +88,11 @@
 
 ## 🤖 AI 开发工作流
 
-本地与 CI 共用“需求确认 → 实现 → 自动验证 → 审查 → 证据交付”闭环，以 Unity CLI 获取真实 Editor 结果。
+使用“需求确认 → 实现 → 按影响验证 → 审查 → 证据交付”闭环，以项目 AIBridge 获取真实 Editor 结果；不声称已配置 CI。
 四项项目技能分别负责 TEngine、Unity 操作、Luban 和 HTML → UGUI；写入先预览并确认，报告明确区分通过、失败、阻塞和未运行。
 
-从 Unity 项目运行 `python .codex/scripts/workflow.py doctor` 检查环境，`check` 检查技能与脚本，`verify --profile full` 执行完整门禁。
-小改交付摘要，重要任务只维护一份记录；不自动安装、提交、打包或发布。
+从 Unity 项目通过项目内 AIBridge CLI 执行 `compile unity`、`editor play`、`get_logs` 等命令获取真实 Editor 结果；
+本仓库不使用 Python 工作流。小改交付摘要，重要任务只维护一份记录；不自动安装、提交、打包或发布。
 
 入口：[AGENTS.md](AGENTS.md) | [Unity 项目约束](UnityProject/AGENTS.md) | [团队使用手册](Books/AI-Development-Workflow.md)
 

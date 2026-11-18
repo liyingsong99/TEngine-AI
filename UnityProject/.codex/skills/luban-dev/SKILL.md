@@ -14,9 +14,9 @@ description: 维护本仓库 Luban 游戏配置的表、数据、枚举、Bean�
 
 | 用户目标 | 执行到哪里 |
 |---|---|
-| 查表、解释结构或讨论方案 | 只读数据、实现和 helper 输出，不导出、不连接 Editor |
-| 修改源记录/字段/模板 | 沿用明确的目标与授权编辑，检查引用和 diff，再隔离 validate |
-| 更新生产生成产物 | 隔离 validate 后 preview，展示覆盖范围，取得确认再 approve/apply |
+| 查表、解释结构或讨论方案 | 只读源数据与实际实现，不导出、不连接 Editor |
+| 修改源记录/字段/模板 | 按授权编辑，检查引用和 diff，再以真实生成器隔离校验 |
+| 更新生产生成产物 | 展示输入、模式和覆盖范围，按有效授权执行现有导表脚本 |
 | 运行时加载问题 | 读真实加载器/生成类；组合 tengine-dev，实际运行验证再用 unity-cli |
 | 按关卡/区间分片 | 先查 exporter、模板与生成 API，当前未实现，不能直接套 tags 或宣称完成 |
 
@@ -25,26 +25,24 @@ description: 维护本仓库 Luban 游戏配置的表、数据、枚举、Bean�
 
 ## 校验与生产导出
 
-1. 用 [helper](scripts/luban_helper.py) 的实际 `--help` 操作；多行 Bean 表头等复杂结构先核对实现，
-   不使用会破坏格式的扁平 CRUD。缺依赖明确阻塞。
-2. `python .codex/scripts/workflow.py luban validate` 在 runs 中复制配置与现有工具快照，
-   用真实 Luban 校验并导出；helper 诊断仅为辅助，不写生产产物。
-3. 需要生产导出时运行 `luban preview --mode lazyload` 或显式 `--mode standard`，
-   展示配置输入、模板、生成 C# 和 bytes 的覆盖范围。
-4. 在具体确认后记录 approve（high-risk），执行 `luban apply`；范围或输入改变则重新预览。
-5. 核对实际产物、模板、模式和隔离输出哈希，随后按生成改动取得 .NET、Editor 及运行证据。
+1. 直接读源表、`luban.conf`、模板和生成产物核对结构；复杂结构先看实现，不使用会破坏格式的扁平 CRUD。
+2. 校验与导出通过仓库现有 Luban 工具（`Tools/Luban`）执行，输出写到临时目录或 runs，不写生产产物。
+   工具路径与覆盖行为先读[现有脚本](references/tengine-integration.md)；本地工具缺失则报告阻塞，不自动安装。
+3. 需要生产导出时先展示配置输入、模板、生成 C# 和 bytes 的覆盖范围，说明将覆盖哪些文件。
+4. 在具体确认后执行导出；范围或输入改变则重新预览。
+5. 核对实际产物、模板与模式，随后按生成改动取得 .NET、Editor 及运行证据。
 
 当前两个脚本均使用 `-d bin`。`lazyload` 增加整表懒加载模板，**不是分片导出**；
 没有经源码证实的 `LoadTbXPartition/ReleaseTbXPartition/ClearPartitions` API。
 分片是另一个需实现和验收的能力，详情见集成参考。
-`luban test` 覆盖当前普通/整表懒加载的隔离导出，不代表分片或所有业务配置通过。
+隔离导出证据只覆盖实际输入与模式，不代表分片或所有业务配置通过。
 
 ## 按需读取
 
 | 任务 | 参考 |
 |---|---|
 | 项目导出、加载器和分片能力边界 | [tengine-integration.md](references/tengine-integration.md) |
-| helper 参数、Excel 修改 | [operating-guide.md](references/operating-guide.md) |
+| 源表修改、导表操作 | [operating-guide.md](references/operating-guide.md) |
 | 类型和 Schema | [type-system.md](references/type-system.md)、[schema.md](references/schema.md) |
 | 配置文件、生成参数 | [luban-conf.md](references/luban-conf.md)、[command-reference.md](references/command-reference.md) |
 | 数据源 | [excel-format.md](references/excel-format.md)、[data-sources.md](references/data-sources.md) |

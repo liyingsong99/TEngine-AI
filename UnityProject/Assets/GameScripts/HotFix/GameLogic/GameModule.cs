@@ -1,9 +1,12 @@
-﻿using GameLogic;
+using GameLogic;
 using TEngine;
 using Object = UnityEngine.Object;
 
 public class GameModule
 {
+    /// <summary>坦克 Demo 战斗入口，生命周期归热更单例系统管理。</summary>
+    public static TankBattleModule TankBattle => TankBattleModule.Instance;
+
     #region 框架模块
 
     /// <summary>

@@ -35,7 +35,7 @@ public partial class GameApp
     
     private static void StartGameLogic()
     {
-        // GameEvent.Get<ILoginUI>().ShowLoginUI();
+        // HUD 完成绑定后启动战斗，避免资源加载期间敌人先行动。
         GameModule.UI.ShowUIAsync<BattleMainUI>();
     }
     

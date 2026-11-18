@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head><meta charset="UTF-8"><title>坦克大战 HUD</title></head><body style="margin:0;background:#0a1117;">
+<div data-u-type="div" data-u-name="BattleMainUI" data-u-layout="stretch" style="position:relative;width:1920px;height:1080px;background:transparent;font-family:Arial,'Microsoft YaHei',sans-serif;">
+  <div data-u-type="div" data-u-name="m_goHud" data-u-layout="stretch" style="position:absolute;left:0;top:0;width:1920px;height:1080px;background:transparent;">
+    <div data-u-type="div" data-u-name="m_goHeader" data-u-layout="top-bar" style="position:absolute;left:0;top:0;width:1920px;height:104px;background-color:#101c26;">
+      <span data-u-type="text" data-u-name="m_textHeader" style="position:absolute;left:240px;top:30px;width:1000px;height:44px;font-size:28px;color:#ecf0e9;text-align:left;">坦克大战 / 防线行动</span>
+      <span data-u-type="text" data-u-name="m_textMode" style="position:absolute;left:1454px;top:34px;width:400px;height:36px;font-size:22px;color:#a9b6be;text-align:right;">单人演示 · 1945</span>
+    </div>
+    <span data-u-type="text" data-u-name="m_textEdition" style="position:absolute;left:64px;top:194px;width:360px;height:32px;font-size:22px;color:#e6b85d;text-align:left;">防守任务 / 01</span>
+    <span data-u-type="text" data-u-name="m_textTitle" style="position:absolute;left:60px;top:246px;width:380px;height:168px;font-size:64px;color:#ecf0e9;text-align:left;">守住基地<br>击退敌军</span>
+    <span data-u-type="text" data-u-name="m_textObjective" style="position:absolute;left:64px;top:444px;width:350px;height:96px;font-size:24px;color:#a9b6be;text-align:left;">击毁全部 3 辆敌方坦克<br>保护基地，存活到最后</span>
+    <div data-u-type="div" data-u-name="m_goAccent" style="position:absolute;left:64px;top:592px;width:56px;height:4px;background-color:#e6b85d;"></div>
+    <span data-u-type="text" data-u-name="m_textControlsTitle" style="position:absolute;left:64px;top:632px;width:320px;height:36px;font-size:24px;color:#ecf0e9;text-align:left;">操作指南</span>
+    <span data-u-type="text" data-u-name="m_textControls" style="position:absolute;left:64px;top:688px;width:360px;height:156px;font-size:25px;color:#a9b6be;text-align:left;">W A S D　移动<br>SPACE　　开火<br>R　　　　结算后重开</span>
+    <span data-u-type="text" data-u-name="m_textPlayerLabel" style="position:absolute;left:1490px;top:202px;width:340px;height:32px;font-size:22px;color:#a9b6be;text-align:left;">装甲 / 玩家生命</span>
+    <span data-u-type="text" data-u-name="m_textPlayerHp" style="position:absolute;left:1484px;top:246px;width:360px;height:90px;font-size:68px;color:#e6b85d;text-align:left;">3 / 3</span>
+    <div data-u-type="div" data-u-name="m_goRule" style="position:absolute;left:1490px;top:370px;width:360px;height:2px;background-color:#33434e;"></div>
+    <span data-u-type="text" data-u-name="m_textWaveLabel" style="position:absolute;left:1490px;top:412px;width:160px;height:36px;font-size:24px;color:#a9b6be;text-align:left;">当前波次</span>
+    <span data-u-type="text" data-u-name="m_textWave" style="position:absolute;left:1690px;top:410px;width:160px;height:40px;font-size:28px;color:#ecf0e9;text-align:right;">1 / 1</span>
+    <span data-u-type="text" data-u-name="m_textRemainingLabel" style="position:absolute;left:1490px;top:486px;width:170px;height:36px;font-size:24px;color:#a9b6be;text-align:left;">剩余敌军</span>
+    <span data-u-type="text" data-u-name="m_textRemainingEnemies" style="position:absolute;left:1690px;top:482px;width:160px;height:44px;font-size:32px;color:#ecf0e9;text-align:right;">3</span>
+    <span data-u-type="text" data-u-name="m_textKillsLabel" style="position:absolute;left:1490px;top:560px;width:170px;height:36px;font-size:24px;color:#a9b6be;text-align:left;">已击毁</span>
+    <span data-u-type="text" data-u-name="m_textKillCount" style="position:absolute;left:1690px;top:558px;width:160px;height:40px;font-size:28px;color:#ecf0e9;text-align:right;">0 / 3</span>
+    <div data-u-type="div" data-u-name="m_goBasePanel" style="position:absolute;left:1490px;top:674px;width:360px;height:124px;background-color:#182833;">
+      <span data-u-type="text" data-u-name="m_textBaseLabel" style="position:absolute;left:24px;top:18px;width:300px;height:32px;font-size:21px;color:#a9b6be;text-align:left;">基地状态</span>
+      <span data-u-type="text" data-u-name="m_textBaseHp" style="position:absolute;left:24px;top:58px;width:300px;height:40px;font-size:28px;color:#e6b85d;text-align:left;">安全 · 1 / 1</span>
+    </div>
+    <span data-u-type="text" data-u-name="m_textFooter" style="position:absolute;left:64px;top:1000px;width:1792px;height:36px;font-size:20px;color:#788b98;text-align:left;">坦克大战　/　3D 演示</span>
+  </div>
+  <div data-u-type="div" data-u-name="m_goResult" data-u-layout="stretch" style="position:absolute;left:0;top:0;width:1920px;height:1080px;background-color:rgba(3,9,14,0.78);">
+    <div data-u-type="div" data-u-name="m_goResultPanel" data-u-layout="center" style="position:absolute;left:600px;top:300px;width:720px;height:480px;background-color:#15232e;">
+      <div data-u-type="div" data-u-name="m_goResultAccent" style="position:absolute;left:0;top:0;width:720px;height:5px;background-color:#e6b85d;"></div>
+      <span data-u-type="text" data-u-name="m_textResultEyebrow" style="position:absolute;left:56px;top:44px;width:608px;height:32px;font-size:22px;color:#e6b85d;text-align:center;">行动结束</span>
+      <span data-u-type="text" data-u-name="m_textResultTitle" style="position:absolute;left:56px;top:94px;width:608px;height:76px;font-size:56px;color:#ecf0e9;text-align:center;">防守成功</span>
+      <span data-u-type="text" data-u-name="m_textResultReason" style="position:absolute;left:56px;top:190px;width:608px;height:44px;font-size:26px;color:#a9b6be;text-align:center;">敌军已全部击退，基地安全。</span>
+      <span data-u-type="text" data-u-name="m_textResultStats" style="position:absolute;left:56px;top:252px;width:608px;height:40px;font-size:26px;color:#ecf0e9;text-align:center;">击毁 3 / 3　 ·　 剩余装甲 3 / 3</span>
+      <div data-u-type="button" data-u-name="m_btnRestart" style="position:absolute;left:176px;top:338px;width:368px;height:78px;background-color:#e6b85d;color:#101c26;font-size:28px;text-align:center;">重新出击　[R]</div>
+    </div>
+  </div>
+</div></body></html>

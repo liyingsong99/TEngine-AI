@@ -1,69 +1,40 @@
-# Pipeline 契约与维护
+# AIBridge 与可选后端契约
+
+文件名保留以避免现有引用断裂；本页当前说明项目使用的 AIBridge，不把历史 Pipeline 配置视为仍已安装。
 
 ## 权威顺序
 
-1. 当前任务的用户约束和两级 AGENTS 决定范围与授权。
-2. 目标实例的实时命令目录、schema、实际结果决定已注册与可用能力。
-3. 本地包源码决定副作用、线程、错误和生命周期；包内文档辅助定位。
-4. 外部官方文档补充设计背景，不能覆盖本地版本事实。
+1. 当前用户约束和两级 AGENTS。
+2. 本地 CLI help、实际目标响应、已安装源码。
+3. 本项目具体 API 实现和资源数据。
+4. 文档仅辅助导航，旧版本命令不是兼容保证。
 
-不要用更新版本的在线示例解释当前包，也不要把包 changelog 当成参数或退出码保证。
+## 当前基线与发现
 
-## 当前磁盘基线
+- Unity 版本见 [ProjectVersion](../../../../ProjectSettings/ProjectVersion.txt)，本项目为 6000.3.28f1，C# 9.0。
+- 包来源见 [manifest](../../../../Packages/manifest.json)。AIBridge 从项目本地 `.aibridge/cli/AIBridgeCLI.exe` 调用。
+- 本轮未找到旧文档引用的独立 Pipeline 包目录与旧 CLI；不以不存在的默认入口指导执行。
+- 不主动升级、安装工具或开启 Code Index。Root Rule 已声明 Code Index disabled。
 
-2026-11-09 核对：Unity `2022.3.62f1`、CLI `1.0.0-beta.3`、Pipeline `0.10.0-exp.1`。
-这是本次维护记录，不是后续任务的固定要求。每次从以下文件和 `doctor` 重新确认：
+## 不可混用的契约
 
-- [ProjectVersion](../../../../ProjectSettings/ProjectVersion.txt)。
-- [包元数据](../../../../Packages/com.unity.pipeline/package.json)。
-- [包命令索引](../../../../Packages/com.unity.pipeline/Documentation~/command-reference.md)。
-- [命令注册与参数约定](../../../../Packages/com.unity.pipeline/Documentation~/creating-commands.md)。
-- [连接及输出契约](../../../../Packages/com.unity.pipeline/Documentation~/connectivity.md)。
-
-| 能力 | 当前限制 |
+|类别|当前 AIBridge|
 |---|---|
-| 普通 Editor 对象、Prefab、资源、编译和测试 | 按实际注册 schema 和平台条件使用 |
-| Build Profile | Unity 6 功能，2022.3 可返回 `feature_unavailable` |
-| Multiplayer Play Mode 场景命令 | Unity 6000.3+ 且安装相应包才注册 |
-| Multiplayer Roles | Unity 6000.6+ |
-| UI Toolkit 元素 capture、模态弹窗镜像 | Unity 6000.7+；普通 Game/Scene/window capture 另行判断 |
-| Runtime Pipeline | 实验性桌面 Player 流程，不能据描述文件路径推断移动端正式支持 |
-| HTTP detached jobs | 包支持，不保证当前 CLI 提供 `--detach` 或顶层 `unity job`；不跨域重载 |
+|Editor 状态|editor get_state|
+|当前场景与层级|scene get_active / get_hierarchy|
+|编译|compile unity|
+|资源搜索|asset find --filter ... 或 asset search|
+|字段|inspector get_property，参数按 help|
+|截图|screenshot game；返回路径按实际响应读取|
+|Editor C#|code execute；文件仅 .aibridge/code 下 .cs/.csx|
+|Runtime|runtime list_targets/status，target/runtime-dir 等参数见 help|
 
-功能未注册、返回 feature_unavailable 或目标条件不足时，说明具体限制，不能自动升级。
+code execute 的 native 默认执行，显式 Pipeline backend 默认预检；test native 与 Pipeline 的筛选器、状态 ID 不同。某命令列出 backend 选项不表示该后端已安装或本工程可用。不能静默换工具/后端将阻塞包装成通过。
 
-## 已核实的迁移差异
+CLI 响应结构按命令读取：外层 success、业务状态、errors、数量与产物共同构成证据。不要将领域结果当普通 envelope 剥离，也不要只依赖旧版本退出码或计数。
 
-当前全名是 `<group> <name>`：`editor status`、`scene list_open`、`script recompile`、`test run`。
-旧 `editor_status/list_tests/run_tests` 等通常给改名提示，不能作为兼容入口。
-目录项用 `command` 保留全名，不能只读 `name`，否则多个组的 list/get/status 会合并。
+## 维护
 
-参数按 schema 大小写及连字符原样发送。截图保存参数是 `output-path`，
-读取字段的精简形式是 `detail=value`；包 changelog 中旧 `save_path` 等字样不能直接复制。
+工具升级后核对本次涉及的 action、参数、默认值、结果和目标身份；先查 help/源码，再按授权实际验证。纯文档修正只做文本/链接/JSON 检查，不声称验证运行能力。
 
-服务返回既有 lean `{success,result}` envelope，也有领域 response；
-测试的 summary/results 不能被当作 envelope 错误剥离。Pipeline 协议的格式化结果可能为 NDJSON，
-不能假定每次都有相同的 CLI 外壳。
-
-`MainThreadRequired=false` 只说明不必在 Unity 主线程执行。
-立即旁路还由内部 ImmediateCommand/队列机制决定，不对所有后台命令承诺瞬时响应。
-Server ready 与 Editor ready 也不是同一条件，见 [操作规程](operations.md)。
-
-## 升级后的维护顺序
-
-包或 CLI 版本变化后，先记录变更范围，运行 help 和本工程只读发现；不自动升级来修工作流。
-比较本次要用的 command、参数、响应模型、终态和版本条件，修改适配器及对应测试。
-执行 `check`、相关隔离回归和必要的真实 Editor 验证，再更新技能中的版本记录与限制。
-
-参考源码导航：
-
-| 主题 | 源码目录 |
-|---|---|
-| canonical 名称和旧名提示 | `Packages/com.unity.pipeline/Runtime/Common`、`Editor/ObsoleteCommandNames.json` |
-| 命令目录和 schema | `Runtime/Commands/PipelineCommands.cs`、命令注册实现 |
-| 服务与 Editor 状态 | `Editor/EditorPipelineServer.cs`、`Editor/Commands/EditorStatusCommand.cs` |
-| 编译与测试 | `Editor/Commands/RecompileCommand.cs`、`Editor/Testing/PipelineTestRunner.cs` |
-| 路径、对象、Undo | `Editor/Authoring` |
-| 批处理与等待 | `Editor/Commands/Batch`、对应命令实现 |
-
-包源码不因工作流适配需要而直接修改。维护项目命令和包装器时按[内容操作](authoring.md)扩展。
+连接、超时和串行约束见[操作规程](operations.md)；内容扩展见[内容操作](authoring.md)。保留领域知识，不通过修改第三方包迎合文档。

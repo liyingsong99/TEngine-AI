@@ -54,8 +54,8 @@ Meaning:
 - `schemaVersion`: `2` enables smart image and adaptive layout behavior.
 - `designWidth` / `designHeight`: CanvasScaler reference resolution.
 - `sourcePath` / `htmlFilePath` / `sourceDirectory`: used to resolve relative image sources.
-  The browser writes resolved local absolute paths at runtime; do not commit machine-specific results.
-  Hand-authored relative metadata is resolved against the Unity project. Omitting it uses the JSON directory.
+  Do not assume the converter resolves source paths automatically; inspect the actual JSON and avoid committing machine-specific absolute paths.
+  The automated Bake API receives JSON text, not its source filename, and only accepts imported Assets/Packages Sprite paths. Source metadata does not authorize image copying or bypass API validation.
 
 ## v2 Node Fields
 

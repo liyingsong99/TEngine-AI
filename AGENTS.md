@@ -7,7 +7,7 @@
 1. 先读相关实现与 `git status`，保留已有修改；不得恢复用户删除的文件。
 2. 根据影响面选择验证。小改直接实现；跨模块、高风险、多阶段任务先明确目标和验收，用一份任务文档记录决策、授权与证据。
 3. 读取下表对应技能的 `SKILL.md`，再按需读取 reference。未出现在技能菜单时直接读取文件，不依赖用户级安装。
-4. 源码用代码编辑工具修改。Unity 对象、序列化、资源数据库和 Editor 生命周期通过本项目 Unity CLI 验证。
+4. 源码用代码编辑工具修改。Unity 对象、序列化、资源数据库和 Editor 生命周期通过本项目 AIBridge 和 Unity API 验证。
 5. 交付说明变更、实际执行的验证、剩余风险和阻塞。没有证据的检查不能标成通过。
 
 | 任务 | 项目技能入口 |
@@ -23,11 +23,13 @@
 - 删除、覆盖、包依赖/项目设置变更、平台切换、真实构建须单独明确授权；计划获准不等于获准发布。
 - 不自动安装/升级工具，不提交、推送、上传、签名或发布，不修改用户级技能配置。
 - 不使用旧的规范管理工具或 Unity MCP。其他项目/用途的全局技能不属于本仓库依赖。
-- CLI 的 `confirm` 参数不是用户授权本身。脚本审批记录用于防止误操作，不是对恶意本地用户的安全沙箱。
+- CLI 的 `confirm` 参数不是用户授权本身。任务中的授权记录用于明确范围，不是本地文件安全沙箱。
 
 ## 验证入口
 
-从仓库根执行 `python UnityProject/.codex/scripts/workflow.py --help`。
+Unity 侧的编译、Play、日志、资源与截图一律通过项目内 AIBridge CLI（`UnityProject/.aibridge/cli/AIBridgeCLI.exe`）执行，
+使用 `compile unity`、`editor play`、`get_logs`、`screenshot` 等命令，命令参考见 [unity-cli](UnityProject/.codex/skills/unity-cli/SKILL.md)。
+本仓库不使用 Python 工作流，也不要求安装 Python 依赖；没有可执行检查项时如实标注未运行，不要写成通过。
 完整说明见 [工作流指南](Books/AI-Development-Workflow.md)，Unity 专项约束见 [项目入口](UnityProject/AGENTS.md)。
 任务模板见 [task.md](UnityProject/.codex/templates/task.md)。不要求小改创建任务文件。
 

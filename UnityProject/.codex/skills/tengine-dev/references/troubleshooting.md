@@ -3,7 +3,7 @@
 | 现象 | 最小诊断证据 |
 |---|---|
 | 编译失败 | 完整解决方案输出、实际编译输入、Editor 编译终态；新增文件是否已导入 |
-| Editor 不可连接 | doctor 报告、明确项目路径和实例状态；不读取鉴权描述文件内容 |
+| Editor 不可连接 | AIBridge 状态/连接错误、明确项目路径和实例状态；不读取鉴权描述文件内容 |
 | UI 空白 | 资源地址、节点组件、Canvas/RectTransform、字体和图片引用、截图 |
 | await 返回后 UI 不可用 | IsPrepare、面板对象、实际加载错误；不能把 ShowUIAsyncAwait 返回当成功 |
 | 事件不触发 | 注册/发送 ID 与参数类型、Init、窗口隐藏/销毁状态和回调次数 |
@@ -15,7 +15,7 @@
 和 [配置集成](luban-config.md)；优先沿实际失败调用链定位，不以旧文档中的方法名作为存在证明。
 
 保留失败现场；不要默认删除 Library、persistentDataPath、缓存、包锁或重置用户场景。
-没有连接时静态定位可继续，必需 Editor 验收标 blocked。Unity Pipeline 是当前项目 Editor/Player 证据入口，
+没有连接时静态定位可继续，必需 Editor 验收标 blocked。项目 AIBridge 是 Editor/Player 证据入口，
 连接、能力发现、异步任务和诊断操作按 [unity-cli](../../unity-cli/SKILL.md) 及其 [操作规程](../../unity-cli/references/operations.md) 执行。
 
 查询不到的状态不能推断为正常；写入超时先核对实际结果，不自动重放。

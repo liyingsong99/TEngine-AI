@@ -805,13 +805,14 @@
             const backgroundImageSrc = firstCssUrl(style.backgroundImage);
             const imageSrc = readAttr(element, ['data-u-src', 'src']);
             const imageFit = readAttr(element, ['data-u-fit']) || style.objectFit || style.backgroundSize || '';
+            const value = parseFloat(element.getAttribute('data-u-value'));
 
             nodeData = {
                 schemaVersion: 2,
                 name: uName,
                 type: uType,
                 dir: element.getAttribute('data-u-dir') || 'v',
-                value: parseFloat(element.getAttribute('data-u-value')) || 0.5,
+                value: Number.isFinite(value) ? value : 0.5,
                 isChecked: element.getAttribute('data-u-checked') === 'true',
                 options: uOptions,
                 x: Math.round(relativeX),

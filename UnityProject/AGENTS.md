@@ -1,12 +1,12 @@
-﻿# Unity Project Instructions
+# Unity Project Instructions
 
 公共工作方式见 [仓库入口](../AGENTS.md)。本文件只补充 Unity 项目约束。
 
 ## 工程事实
 
-- 项目根是本目录，CLI 为 `Tools/unity.exe`，解决方案为 `UnityProject.sln`。
+- 项目根是本目录，CLI 为 `.aibridge/cli/AIBridgeCLI.exe`；生成解决方案是否存在需实际检查，不合成或借用其他工程。
 - 配置源位于仓库根 `Configs/GameConfig`，不是 Unity 项目内的 `Configs`。
-- Pipeline 能力以本项目注册命令及包内 `Documentation~` 为准。
+- AIBridge 能力以本地 help、已安装源码和本项目实际响应为准，native 与可选 backend 不混用。
 
 ## 编码边界
 
@@ -18,27 +18,16 @@
 - 修改配置加载器、生成类时追溯 `Configs/GameConfig` 中模板；不直接修补生成产物。
 - 不直接编辑 Scene/Prefab YAML、GUID 或 `.meta` 来替代资源数据库操作；新增源文件的 `.meta` 由 Unity 生成。
 
+
 ## 验证选择
-
-```powershell
-python .codex/scripts/workflow.py doctor
-python .codex/scripts/workflow.py check
-python .codex/scripts/workflow.py verify --profile docs
-python .codex/scripts/workflow.py verify --profile code
-python .codex/scripts/workflow.py verify --profile unity
-python .codex/scripts/workflow.py verify --profile full
-```
-
-`docs` 不连接 Editor；`code` 包含 docs 检查及完整解决方案构建；`unity` 包含 Editor 编译、指定资源和明确测试集；
-`full` 组合全部并运行隔离的真实 Luban 普通/整表懒加载导出、当前配置源生成校验、浏览器图片/字体/多分辨率回归。
-C# / 资源变更交付需同时取得 .NET 与相关 Unity 验证证据。纯文档或纯 Python 修改不必形式化触发 Unity。
+C# / 资源变更执行 Unity 编译与相关运行验证；有有效生成解决方案时补 .NET 检查，缺项如实列出。纯文档只做内容、链接与 diff 检查，不触发 Unity。
+本仓库不使用 Python 工作流：Unity 侧一律通过项目内 AIBridge CLI 执行，不做 Python 依赖预检。
 Editor 断开、忙、多实例或选中零用例时，必需验证返回阻塞/失败，不能降级声称验收通过。
 
-Unity 自动化以 `Packages/com.unity.pipeline` 为执行基础。命令使用实时发现的 `<group> <name>` 与参数 schema；
-服务 ready 不等于 Editor 空闲，状态观察与新操作分别判断。具体规程只在项目 unity-cli 技能维护。
-当前场景资产校验不遍历场景内部，不能替代场景内容验收；Luban lazyload 当前是整表懒加载，不代表分片能力。
+Unity 自动化使用项目 AIBridge；编译、导入、测试、Play 与写入串行。一次性 Editor C# 通过 code execute 调用，超时先查 code status，不重放。
+主资产存在或 importer 检查不能替代场景内部验收；Luban lazyload 是整表懒加载，不代表分片能力。当前坦克 Demo 使用 UnityEngine.UI.Text，不导入 TMP 基础资源；通用烘焙器保留两种文字模式。
 
-Pipeline 描述文件含鉴权信息，禁止读出到日志、提交或分享。不得连接本机其他工程代替本项目验证。
+工具连接描述文件可能含鉴权信息，禁止读出到日志、提交或分享。不得连接本机其他工程代替本项目验证。
 
 <!-- AIBRIDGE:START {"assistant":"aibridge","templateId":"unity-integration","version":11,"target":"root-rule"} -->
 ## AIBridge Bootstrap

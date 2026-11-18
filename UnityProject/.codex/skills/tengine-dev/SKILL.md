@@ -6,8 +6,7 @@ description: 在本仓库实现、排查或审查 TEngine 模块、UIWindow/UIWi
 # TEngine 开发
 
 先用 `git status` 和相关实现确定当前基线，沿调用方、接口、实现、asmdef 和测试追踪行为。
-本技能提供框架决策与源码导航；Editor/Player 的执行层是
-[`com.unity.pipeline`](../../../Packages/com.unity.pipeline/package.json)，通过项目
+本技能提供框架决策与源码导航；Editor/Player 通过项目 AIBridge 操作。详见
 [unity-cli](../unity-cli/SKILL.md) 操作。参考中的签名与示例必须再次对照当前源码。
 
 ## 开发闭环
@@ -16,7 +15,7 @@ description: 在本仓库实现、排查或审查 TEngine 模块、UIWindow/UIWi
 2. 按下表只读相关主题，确认主包/热更边界、事件订阅方、资源持有方和异步结束条件。
 3. 使用代码编辑工具实施，沿用相邻代码的模块与异步模式；配置生成代码回溯源模板。
 4. 依据[验证选择](references/verification.md)执行门禁。涉及序列化、资源和运行状态时加载项目 unity-cli，
-   先发现本工程 Pipeline 命令与参数，再选择验证。
+   先核对本地 AIBridge action 与参数，再选择验证。
 5. 交付变更、实际证据、兼容性影响和未完成项。缺少 Editor 或匹配测试时说明具体阻塞。
 
 ## 按任务读取
@@ -30,7 +29,7 @@ description: 在本仓库实现、排查或审查 TEngine 模块、UIWindow/UIWi
 | 热更、主包与程序集依赖 | [程序集与启动](references/architecture.md) | [热更开发](references/hotfix-workflow.md) |
 | 绑定生成和命名 | [命名与绑定](references/naming-rules.md) | 生成器、配置资源和实际 Prefab |
 | 游戏配置接入 | [配置集成路由](references/luban-config.md) | [luban-dev](../luban-dev/SKILL.md) |
-| 失败定位 | [故障定位](references/troubleshooting.md) | 对应领域参考及 Pipeline 诊断 |
+| 失败定位 | [故障定位](references/troubleshooting.md) | 对应领域参考及 AIBridge 诊断 |
 
 ## 实现时必须确定
 
