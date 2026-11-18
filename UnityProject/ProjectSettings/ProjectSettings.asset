@@ -816,7 +816,7 @@ PlayerSettings:
   webWasm2023: 0
   webEnableSubmoduleStrippingCompatibility: 0
   scriptingDefineSymbols:
-    Android: TextMeshPro;ENABLE_HYBRIDCLR;AIBRIDGE_HYBRIDCLR_AVAILABLE;ENABLE_LOG
+    Android: TextMeshPro;AIBRIDGE_HYBRIDCLR_AVAILABLE;ENABLE_LOG
     EmbeddedLinux: UNITY_POST_PROCESSING_STACK_V2;TextMeshPro
     GameCoreScarlett: TextMeshPro
     GameCoreXboxOne: UNITY_POST_PROCESSING_STACK_V2;TextMeshPro
